@@ -65,7 +65,6 @@ with st.sidebar:
         ]
         st.rerun()
 
-    use_web = st.checkbox("🔎 Inclure une recherche web", value=False)
 
 # 💬 Affichage de la conversation
 st.markdown("## 💬 Conversation")
@@ -87,6 +86,8 @@ for msg in st.session_state.history[1:]:
 
 # 🧾 Entrée utilisateur
 question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
+    use_web = st.checkbox("🔎 Inclure une recherche web", value=False)
+
 if st.button("Demander à Goût-gle") and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
