@@ -3,5 +3,7 @@ uvicorn
 requests
 streamlit
 openai==1.2.3
+httpx==0.24.1
+httpcore==0.16.3
 langdetect
 PyPDF2
