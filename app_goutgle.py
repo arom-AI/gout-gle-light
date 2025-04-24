@@ -4,15 +4,15 @@ import glob
 import streamlit as st
 import openai
 
-# Clé API
+# Config OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Streamlit config
+# Config Streamlit
 st.set_page_config(page_title="Goût-gle", page_icon="🍷")
 st.title("🍷 Goût-gle – Ton assistant gastronomique")
 st.markdown("Pose une question sur le vin, les plats, les accords…")
 
-# Chargement dynamique des fichiers de données
+# Chargement de tous les fichiers découpés
 base = []
 for file in sorted(glob.glob("data/part_*.json")):
     with open(file, "r", encoding="utf-8") as f:
@@ -21,7 +21,7 @@ for file in sorted(glob.glob("data/part_*.json")):
         except Exception as e:
             st.warning(f"Erreur dans {file} : {e}")
 
-# Fonction de recherche simple dans la base
+# Recherche contextuelle
 def find_relevant_context(question):
     question_words = question.lower().split()
     results = []
@@ -30,13 +30,13 @@ def find_relevant_context(question):
             results.append(item["contenu"])
     return "\n".join(results[:3])
 
-# Mémoire de conversation
+# Historique conversation
 if "history" not in st.session_state:
     st.session_state.history = [
         {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique."}
     ]
 
-# Sidebar : reset
+# Sidebar : réinitialisation
 with st.sidebar:
     if st.button("🗑️ Nouvelle conversation"):
         st.session_state.history = [
@@ -54,7 +54,7 @@ for msg in st.session_state.history[1:]:
         unsafe_allow_html=True
     )
 
-# Entrée utilisateur
+# Champ de saisie
 question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
 if st.button("Demander à Goût-gle") and question:
     contexte = find_relevant_context(question)
