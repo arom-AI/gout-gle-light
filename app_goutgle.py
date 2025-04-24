@@ -68,7 +68,7 @@ Voici des extraits de documents pour t'aider :
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
         try:
-            response = openai.ChatCompletion.create(  # ✅ CORRECT
+            response = openai.chat.completions.create(
                 model="gpt-4",
                 messages=st.session_state.history,
                 temperature=0.7
