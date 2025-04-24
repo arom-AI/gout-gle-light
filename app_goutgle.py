@@ -106,7 +106,8 @@ if st.button("Demander à Goût-gle") and question:
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
         try:
-            response = openai.completions.create(  # ✅ Utilisation de la nouvelle méthode
+            # ✅ Utilisation de la méthode correcte `openai.completions.create()` avec `messages`
+            response = openai.completions.create(
                 model="gpt-4",
                 messages=st.session_state.history + [{"role": "user", "content": prompt}],
                 temperature=0.7
