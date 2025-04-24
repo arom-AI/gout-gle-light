@@ -36,7 +36,7 @@ with st.sidebar:
         st.session_state.history = [
             {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique."}
         ]
-        st.experimental_rerun()
+        st.rerun()  # ✅ mis à jour
 
 # Affichage conversation en bulles
 st.markdown("## 💬 Conversation")
@@ -68,13 +68,13 @@ Voici des extraits de documents pour t'aider :
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
         try:
-            response = openai.chat.completions.create(
+            response = openai.chat.completions.create(  # ✅ nouvelle API
                 model="gpt-4",
                 messages=st.session_state.history,
                 temperature=0.7
             )
             answer = response.choices[0].message.content.strip()
             st.session_state.history.append({"role": "assistant", "content": answer})
-            st.experimental_rerun()
+            st.rerun()  # ✅ mis à jour
         except Exception as e:
             st.error(f"❌ Erreur : {e}")
