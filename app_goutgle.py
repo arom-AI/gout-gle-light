@@ -106,13 +106,16 @@ if st.button("Demander à Goût-gle") and question:
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
         try:
-            # ✅ Utilisation de la méthode correcte `openai.ChatCompletion.create()`
+            # 🔄 Mise à jour de l'appel OpenAI avec la méthode correcte
             response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=st.session_state.history + [{"role": "user", "content": prompt}],
+                model="gpt-4",  # ou gpt-3.5 selon votre choix
+                messages=[
+                    {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique."},
+                    {"role": "user", "content": prompt}
+                ],
                 temperature=0.7
             )
-            answer = response.choices[0].message["content"].strip()
+            answer = response['choices'][0]['message']['content'].strip()  # Récupérer la réponse
             st.session_state.history.append({"role": "assistant", "content": answer})
             st.rerun()
         except Exception as e:
