@@ -106,13 +106,13 @@ if st.button("Demander à Goût-gle") and question:
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
         try:
-            # ✅ Utilisation de la méthode correcte `openai.completions.create()` avec `messages`
-            response = openai.completions.create(
+            # ✅ Utilisation de la méthode correcte `openai.ChatCompletion.create()`
+            response = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=st.session_state.history + [{"role": "user", "content": prompt}],
                 temperature=0.7
             )
-            answer = response.choices[0].message.content.strip()
+            answer = response.choices[0].message["content"].strip()
             st.session_state.history.append({"role": "assistant", "content": answer})
             st.rerun()
         except Exception as e:
