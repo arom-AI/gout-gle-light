@@ -8,3 +8,7 @@ httpcore==0.16.3
 langdetect
 PyPDF2
 google-search-results
+PyPDF2
+pytesseract
+Pillow
+
