@@ -113,20 +113,42 @@ if uploaded_file:
     else:
         st.warning("❗ Format de fichier non supporté pour l'instant.")
 
-
 # 🧾 Entrée utilisateur
 st.markdown("---")
 
-# Champ de question utilisateur
-question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
-
-# Deux boutons côte à côte
-col1, col2 = st.columns([1, 1.5])
+# Quatre colonnes alignées
+col1, col2, col3, col4 = st.columns([5, 2, 3, 2])
 
 with col1:
-    use_web = st.checkbox("🔎 Inclure la recherche web", value=False)
+    question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
 
 with col2:
+    use_web = st.checkbox("🔎 Recherche web", value=False)
+
+with col3:
+    uploaded_file = st.file_uploader("📁", type=["txt", "pdf", "png", "jpg", "jpeg"], label_visibility="collapsed")
+
+uploaded_content = ""
+
+if uploaded_file:
+    file_extension = uploaded_file.name.split(".")[-1].lower()
+
+    if file_extension in ["txt"]:
+        uploaded_content = uploaded_file.read().decode("utf-8")
+    elif file_extension in ["pdf"]:
+        from PyPDF2 import PdfReader
+        pdf_reader = PdfReader(uploaded_file)
+        for page in pdf_reader.pages:
+            uploaded_content += page.extract_text()
+    elif file_extension in ["jpg", "jpeg", "png"]:
+        from PIL import Image
+        import pytesseract
+        image = Image.open(uploaded_file)
+        uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
+    else:
+        st.warning("❗ Format de fichier non supporté pour l'instant.")
+
+with col4:
     if st.button("Demander à Goût-gle") and question:
         local_context = find_relevant_context(question)
         web_context = search_web(question) if use_web else ""
@@ -145,7 +167,6 @@ Contenu extrait du fichier uploadé :
 
 Réponds de façon claire, experte, localisée et agréable à lire.
 """
-
         st.session_state.history.append({"role": "user", "content": question})
 
         with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
@@ -160,6 +181,7 @@ Réponds de façon claire, experte, localisée et agréable à lire.
                 st.rerun()
             except Exception as e:
                 st.error(f"❌ Erreur : {e}")
+
 
 
 # 🧼 Sidebar reset
