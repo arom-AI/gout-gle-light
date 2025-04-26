@@ -90,10 +90,10 @@ for msg in st.session_state.history[1:]:
 # 🧾 Entrée utilisateur
 st.markdown("---")
 
-# Question principale
+# Barre de question
 question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)", key="question_input")
 
-# Ligne de boutons
+# Ligne de boutons : Demander / Internet / Upload
 col1, col2, col3 = st.columns([1.5, 1, 0.5])
 
 with col1:
@@ -103,12 +103,12 @@ with col2:
     use_web = st.checkbox("🌐 Internet", key="use_web")
 
 with col3:
-    toggle_upload = st.toggle("➕", key="toggle_upload")
+    toggle_upload = st.checkbox("➕", key="toggle_upload", label_visibility="collapsed")
 
-# Zone Upload cachée (expand only if toggle)
+# Si toggle activé ➡️ afficher le file uploader
 uploaded_content = ""
 if toggle_upload:
-    uploaded_file = st.file_uploader("📁 Uploade un fichier (.txt, .pdf, .jpg, .png)", type=["txt", "pdf", "png", "jpg", "jpeg"])
+    uploaded_file = st.file_uploader("📁 Uploade ton fichier (.txt, .pdf, .jpg, .png)", type=["txt", "pdf", "png", "jpg", "jpeg"])
     
     if uploaded_file:
         file_extension = uploaded_file.name.split(".")[-1].lower()
@@ -125,7 +125,7 @@ if toggle_upload:
         else:
             st.warning("❗ Format de fichier non supporté pour l'instant.")
 
-# Si tu cliques sur "Demander à Goût-gle"
+# Quand on clique sur Demander à Goût-gle
 if ask_button and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
