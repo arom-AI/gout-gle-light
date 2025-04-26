@@ -90,41 +90,39 @@ for msg in st.session_state.history[1:]:
 # 🧾 Entrée utilisateur
 st.markdown("---")
 
-# Champ de question centré
+# Champ de question large
 question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)", key="question_input")
 
-# Section juste en dessous avec Web Search + Uploader
-col_web, col_upload = st.columns([1, 2])
+# 3 Colonnes : Demander à Goût-gle / Internet / Browse files
+col1, col2, col3 = st.columns([1.5, 1, 1])
 
-with col_web:
-    use_web = st.checkbox("🔎 Inclure la recherche web", value=False)
+with col1:
+    ask_button = st.button("🚀 Demander à Goût-gle", use_container_width=True)
 
-with col_upload:
-    uploaded_file = st.file_uploader("📁 Uploade un fichier (.txt, .pdf, .jpg, .png)", type=["txt", "pdf", "png", "jpg", "jpeg"])
+with col2:
+    use_web = st.checkbox("🌐 Internet", key="use_web")
+
+with col3:
+    uploaded_file = st.file_uploader("", type=["txt", "pdf", "png", "jpg", "jpeg"], label_visibility="collapsed")
 
 uploaded_content = ""
 
+# Extraction fichier uploadé
 if uploaded_file:
     file_extension = uploaded_file.name.split(".")[-1].lower()
-
-    if file_extension in ["txt"]:
+    if file_extension == "txt":
         uploaded_content = uploaded_file.read().decode("utf-8")
-    elif file_extension in ["pdf"]:
-        from PyPDF2 import PdfReader
+    elif file_extension == "pdf":
         pdf_reader = PdfReader(uploaded_file)
         for page in pdf_reader.pages:
             uploaded_content += page.extract_text()
     elif file_extension in ["jpg", "jpeg", "png"]:
-        from PIL import Image
-        import pytesseract
         image = Image.open(uploaded_file)
         uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
-    else:
-        st.warning("❗ Format de fichier non supporté pour l'instant.")
+    st.session_state["uploaded_content"] = uploaded_content
 
-# Gros bouton Demander centré
-st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-if st.button("🚀 Demander à Goût-gle", key="submit_button") and question:
+# Si on clique sur "Demander à Goût-gle"
+if ask_button and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
 
@@ -144,7 +142,7 @@ Réponds de façon claire, experte, localisée et agréable à lire.
 """
     st.session_state.history.append({"role": "user", "content": question})
 
-    with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
+    with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
         try:
             response = client.chat.completions.create(
                 model="gpt-4",
@@ -156,6 +154,7 @@ Réponds de façon claire, experte, localisée et agréable à lire.
             st.rerun()
         except Exception as e:
             st.error(f"❌ Erreur : {e}")
+
 st.markdown("</div>", unsafe_allow_html=True)
 
 # 🧼 Sidebar reset
