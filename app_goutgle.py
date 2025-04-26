@@ -116,17 +116,17 @@ if uploaded_file:
 # 🧾 Entrée utilisateur
 st.markdown("---")
 
-# Quatre colonnes bien proportionnées
-col1, col2, col3, col4 = st.columns([5, 1, 1.5, 2])
+# Champ de question centré
+question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)", key="question_input")
 
-with col1:
-    question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
+# Section juste en dessous avec Web Search + Uploader
+col_web, col_upload = st.columns([1, 2])
 
-with col2:
-    use_web = st.checkbox("🌐", value=False, help="Inclure la recherche web")
+with col_web:
+    use_web = st.checkbox("🔎 Inclure la recherche web", value=False)
 
-with col3:
-    uploaded_file = st.file_uploader("📁", type=["txt", "pdf", "png", "jpg", "jpeg"], label_visibility="collapsed")
+with col_upload:
+    uploaded_file = st.file_uploader("📁 Uploade un fichier (.txt, .pdf, .jpg, .png)", type=["txt", "pdf", "png", "jpg", "jpeg"])
 
 uploaded_content = ""
 
@@ -148,12 +148,13 @@ if uploaded_file:
     else:
         st.warning("❗ Format de fichier non supporté pour l'instant.")
 
-with col4:
-    if st.button("🚀 Demander à Goût-gle") and question:
-        local_context = find_relevant_context(question)
-        web_context = search_web(question) if use_web else ""
+# Gros bouton Demander centré
+st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+if st.button("🚀 Demander à Goût-gle", key="submit_button") and question:
+    local_context = find_relevant_context(question)
+    web_context = search_web(question) if use_web else ""
 
-        prompt = f"""
+    prompt = f"""
 Voici une question : {question}
 
 Voici des extraits de documents pour t'aider :
@@ -167,20 +168,21 @@ Contenu extrait du fichier uploadé :
 
 Réponds de façon claire, experte, localisée et agréable à lire.
 """
-        st.session_state.history.append({"role": "user", "content": question})
+    st.session_state.history.append({"role": "user", "content": question})
 
-        with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-4",
-                    messages=st.session_state.history + [{"role": "user", "content": prompt}],
-                    temperature=0.7
-                )
-                answer = response.choices[0].message.content.strip()
-                st.session_state.history.append({"role": "assistant", "content": answer})
-                st.rerun()
-            except Exception as e:
-                st.error(f"❌ Erreur : {e}")
+    with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=st.session_state.history + [{"role": "user", "content": prompt}],
+                temperature=0.7
+            )
+            answer = response.choices[0].message.content.strip()
+            st.session_state.history.append({"role": "assistant", "content": answer})
+            st.rerun()
+        except Exception as e:
+            st.error(f"❌ Erreur : {e}")
+st.markdown("</div>", unsafe_allow_html=True)
 
 # 🧼 Sidebar reset
 with st.sidebar:
