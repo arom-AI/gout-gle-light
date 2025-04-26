@@ -123,8 +123,12 @@ if toggle_upload:
             image = Image.open(uploaded_file)
             try:
                 uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
+            except pytesseract.TesseractNotFoundError:
+                st.error("❌ Tesseract OCR n'est pas installé correctement.")
             except pytesseract.TesseractError:
+           # Si la langue fra n'est pas installée, fallback en anglais seulement
                 uploaded_content = pytesseract.image_to_string(image, lang="eng")
+
    
 
         else:
