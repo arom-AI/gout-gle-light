@@ -85,43 +85,47 @@ for msg in st.session_state.history[1:]:
 
 # 🧾 Entrée utilisateur
 st.markdown("---")
-col1, col2 = st.columns([5, 2])
+
+# Champ de question utilisateur
+question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
+
+# Deux boutons côte à côte
+col1, col2 = st.columns([1, 1.5])
 
 with col1:
-    question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
+    use_web = st.checkbox("🔎 Inclure la recherche web", value=False)
 
 with col2:
-    use_web = st.checkbox("🔎 Inclure une recherche web", value=False)
+    if st.button("Demander à Goût-gle") and question:
+        local_context = find_relevant_context(question)
+        web_context = search_web(question) if use_web else ""
 
-if st.button("Demander à Goût-gle") and question:
-    local_context = find_relevant_context(question)
-    web_context = search_web(question) if use_web else ""
+        prompt = f"""
+        Voici une question : {question}
 
-    prompt = f"""
-    Voici une question : {question}
+        Voici des extraits de documents pour t'aider :
+        {local_context}
 
-    Voici des extraits de documents pour t'aider :
-    {local_context}
+        Résultats de recherche web récents :
+        {web_context}
 
-    Résultats de recherche web récents :
-    {web_context}
+        Réponds de façon claire, experte, localisée et agréable à lire.
+        """
+        st.session_state.history.append({"role": "user", "content": question})
 
-    Réponds de façon claire, experte, localisée et agréable à lire.
-    """
-    st.session_state.history.append({"role": "user", "content": question})
+        with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=st.session_state.history + [{"role": "user", "content": prompt}],
+                    temperature=0.7
+                )
+                answer = response.choices[0].message.content.strip()
+                st.session_state.history.append({"role": "assistant", "content": answer})
+                st.rerun()
+            except Exception as e:
+                st.error(f"❌ Erreur : {e}")
 
-    with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=st.session_state.history + [{"role": "user", "content": prompt}],
-                temperature=0.7
-            )
-            answer = response.choices[0].message.content.strip()
-            st.session_state.history.append({"role": "assistant", "content": answer})
-            st.rerun()
-        except Exception as e:
-            st.error(f"❌ Erreur : {e}")
 
 # 🧼 Sidebar reset
 with st.sidebar:
