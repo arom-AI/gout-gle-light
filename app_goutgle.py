@@ -116,14 +116,14 @@ if uploaded_file:
 # 🧾 Entrée utilisateur
 st.markdown("---")
 
-# Quatre colonnes alignées
-col1, col2, col3, col4 = st.columns([5, 1.5, 2, 2])
+# Quatre colonnes bien proportionnées
+col1, col2, col3, col4 = st.columns([5, 1, 1.5, 2])
 
 with col1:
     question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
 
 with col2:
-    use_web = st.checkbox("🔎 Web", value=False, help="Inclure une recherche internet")
+    use_web = st.checkbox("🌐", value=False, help="Inclure la recherche web")
 
 with col3:
     uploaded_file = st.file_uploader("📁", type=["txt", "pdf", "png", "jpg", "jpeg"], label_visibility="collapsed")
@@ -181,7 +181,6 @@ Réponds de façon claire, experte, localisée et agréable à lire.
                 st.rerun()
             except Exception as e:
                 st.error(f"❌ Erreur : {e}")
-
 
 # 🧼 Sidebar reset
 with st.sidebar:
