@@ -122,9 +122,10 @@ if toggle_upload:
         elif file_extension in ["jpg", "jpeg", "png"]:
             image = Image.open(uploaded_file)
             try:
-    uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
-except pytesseract.TesseractError:
-    uploaded_content = pytesseract.image_to_string(image, lang="eng")
+                uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
+            except pytesseract.TesseractError:
+                uploaded_content = pytesseract.image_to_string(image, lang="eng")
+   
 
         else:
             st.warning("❗ Format de fichier non supporté pour l'instant.")
