@@ -103,7 +103,7 @@ with col2:
     use_web = st.checkbox("🌐 Internet", key="use_web")
 
 with col3:
-    uploaded_file = st.file_uploader("", type=["txt", "pdf", "png", "jpg", "jpeg"], label_visibility="collapsed")
+    uploaded_file = st.file_uploader("", type=["txt", "pdf", "png", "jpg", "jpeg"], label_visibility="collapsed", label="")
 
 uploaded_content = ""
 
@@ -121,7 +121,7 @@ if uploaded_file:
         uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
     st.session_state["uploaded_content"] = uploaded_content
 
-# Si on clique sur "Demander à Goût-gle"
+# Action bouton
 if ask_button and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
@@ -154,6 +154,7 @@ Réponds de façon claire, experte, localisée et agréable à lire.
             st.rerun()
         except Exception as e:
             st.error(f"❌ Erreur : {e}")
+
 
 st.markdown("</div>", unsafe_allow_html=True)
 
