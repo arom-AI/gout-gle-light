@@ -86,32 +86,6 @@ for msg in st.session_state.history[1:]:
             </div>
             """, unsafe_allow_html=True)
 
-# 📂 Upload de fichiers
-uploaded_file = st.file_uploader("📁 Uploade un fichier (texte ou image)", type=["txt", "pdf", "png", "jpg", "jpeg"])
-
-uploaded_content = ""
-
-if uploaded_file:
-    file_extension = uploaded_file.name.split(".")[-1].lower()
-
-    if file_extension in ["txt"]:
-        uploaded_content = uploaded_file.read().decode("utf-8")
-
-    elif file_extension in ["pdf"]:
-        from PyPDF2 import PdfReader
-        pdf_reader = PdfReader(uploaded_file)
-        for page in pdf_reader.pages:
-            uploaded_content += page.extract_text()
-
-    elif file_extension in ["jpg", "jpeg", "png"]:
-        from PIL import Image
-        import pytesseract
-
-        image = Image.open(uploaded_file)
-        uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
-
-    else:
-        st.warning("❗ Format de fichier non supporté pour l'instant.")
 
 # 🧾 Entrée utilisateur
 st.markdown("---")
