@@ -35,7 +35,7 @@ def find_relevant_context(question):
             results.append(item["contenu"])
     return "\n".join(results[:3])
 
-# 🌐 Recherche web (SerpAPI) avec liens suisses
+# 🌐 Recherche web (SerpAPI) avec liens
 def search_web(query):
     search = GoogleSearch({
         "q": query + " site:.ch",
@@ -47,27 +47,15 @@ def search_web(query):
     passages = []
     if "organic_results" in results:
         for res in results["organic_results"]:
-            title = res.get("title", "")
-            link = res.get("link", "")
-            snippet = res.get("snippet", "")
-            passages.append(f"**{title}**\n{snippet}\n🔗 {link}")
+            if "snippet" in res and "link" in res:
+                passages.append(f"{res['snippet']}\n🔗 {res['link']}")
     return "\n\n".join(passages[:3])
 
 # 🧠 Initialisation de l'historique
 if "history" not in st.session_state:
     st.session_state.history = [
-        {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu privilégies les sources locales (.ch), donnes les prix en CHF, et fournis les URLs fiables quand tu trouves des références. Tu es très précis, clair et agréable à lire. Tu identifies toujours au moins un lien produit ou distributeur si la recherche web est activée."}
+        {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu privilégies les sources locales (.ch), donnes les prix en CHF, et fournis les URLs quand tu trouves des références. Donne des réponses précises, agréables et claires."}
     ]
-
-# 🧼 Sidebar reset
-with st.sidebar:
-    if st.button("🗑️ Nouvelle conversation"):
-        st.session_state.history = [
-            {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu privilégies les sources locales (.ch), donnes les prix en CHF, et fournis les URLs fiables quand tu trouves des références. Tu es très précis, clair et agréable à lire. Tu identifies toujours au moins un lien produit ou distributeur si la recherche web est activée."}
-        ]
-        st.rerun()
-
-    use_web = st.checkbox("🔎 Inclure une recherche web", value=False)
 
 # 💬 Affichage de la conversation
 st.markdown("## 💬 Conversation")
@@ -88,13 +76,21 @@ for msg in st.session_state.history[1:]:
             """, unsafe_allow_html=True)
 
 # 🧾 Entrée utilisateur
-question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
+st.markdown("---")
+col1, col2 = st.columns([5, 2])
+
+with col1:
+    question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
+
+with col2:
+    use_web = st.checkbox("🔎 Inclure une recherche web", value=False)
+
 if st.button("Demander à Goût-gle") and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
 
     prompt = f"""
-    Voici une question utilisateur : {question}
+    Voici une question : {question}
 
     Voici des extraits de documents pour t'aider :
     {local_context}
@@ -102,9 +98,8 @@ if st.button("Demander à Goût-gle") and question:
     Résultats de recherche web récents :
     {web_context}
 
-    Donne une réponse locale, fiable, précise, avec au moins un lien direct vers un producteur, un domaine ou un distributeur suisse si disponible. Utilise le franc suisse (CHF) pour les prix.
+    Réponds de façon claire, experte, localisée et agréable à lire.
     """
-
     st.session_state.history.append({"role": "user", "content": question})
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée..."):
@@ -119,3 +114,11 @@ if st.button("Demander à Goût-gle") and question:
             st.rerun()
         except Exception as e:
             st.error(f"❌ Erreur : {e}")
+
+# 🧼 Sidebar reset
+with st.sidebar:
+    if st.button("🗑️ Nouvelle conversation"):
+        st.session_state.history = [
+            {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu privilégies les sources locales (.ch), donnes les prix en CHF, et fournis les URLs quand tu trouves des références. Donne des réponses précises, agréables et claires."}
+        ]
+        st.rerun()
