@@ -7,9 +7,17 @@ from serpapi import GoogleSearch
 
 # 🌍 Activation de la recherche web (via checkbox)
 st.set_page_config(page_title="Goût-gle", page_icon="🍷")
-st.markdown("🍷", unsafe_allow_html=True)
-st.title("Goût-gle – Ton assistant gastronomique")
-st.markdown("Pose une question sur le vin, les plats, les accords…")
+
+# Nouveau Titre propre et stylé
+st.markdown(
+    """
+    <div style='text-align: center; margin-top: -30px; margin-bottom: 30px;'>
+        <h1 style='font-size: 3em;'>🍷 Goût-gle – Ton assistant gastronomique</h1>
+        <p style='font-size: 1.2em; color: #ccc;'>Pose une question sur le vin, les plats, les accords…</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # 🔐 API Keys
 env_openai_key = os.getenv("OPENAI_API_KEY")
