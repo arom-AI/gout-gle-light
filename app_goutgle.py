@@ -90,11 +90,11 @@ for msg in st.session_state.history[1:]:
 # 🧾 Entrée utilisateur
 st.markdown("---")
 
-# Champ de question large
+# Question principale
 question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)", key="question_input")
 
-# 3 Colonnes : Demander à Goût-gle / Internet / Browse files
-col1, col2, col3 = st.columns([1.5, 1, 1])
+# Ligne de boutons
+col1, col2, col3 = st.columns([1.5, 1, 0.5])
 
 with col1:
     ask_button = st.button("🚀 Demander à Goût-gle", use_container_width=True)
@@ -103,25 +103,29 @@ with col2:
     use_web = st.checkbox("🌐 Internet", key="use_web")
 
 with col3:
-    uploaded_file = st.file_uploader("", type=["txt", "pdf", "png", "jpg", "jpeg"], label_visibility="collapsed", label="")
+    toggle_upload = st.toggle("➕", key="toggle_upload")
 
+# Zone Upload cachée (expand only if toggle)
 uploaded_content = ""
+if toggle_upload:
+    uploaded_file = st.file_uploader("📁 Uploade un fichier (.txt, .pdf, .jpg, .png)", type=["txt", "pdf", "png", "jpg", "jpeg"])
+    
+    if uploaded_file:
+        file_extension = uploaded_file.name.split(".")[-1].lower()
 
-# Extraction fichier uploadé
-if uploaded_file:
-    file_extension = uploaded_file.name.split(".")[-1].lower()
-    if file_extension == "txt":
-        uploaded_content = uploaded_file.read().decode("utf-8")
-    elif file_extension == "pdf":
-        pdf_reader = PdfReader(uploaded_file)
-        for page in pdf_reader.pages:
-            uploaded_content += page.extract_text()
-    elif file_extension in ["jpg", "jpeg", "png"]:
-        image = Image.open(uploaded_file)
-        uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
-    st.session_state["uploaded_content"] = uploaded_content
+        if file_extension == "txt":
+            uploaded_content = uploaded_file.read().decode("utf-8")
+        elif file_extension == "pdf":
+            pdf_reader = PdfReader(uploaded_file)
+            for page in pdf_reader.pages:
+                uploaded_content += page.extract_text()
+        elif file_extension in ["jpg", "jpeg", "png"]:
+            image = Image.open(uploaded_file)
+            uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
+        else:
+            st.warning("❗ Format de fichier non supporté pour l'instant.")
 
-# Action bouton
+# Si tu cliques sur "Demander à Goût-gle"
 if ask_button and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
@@ -154,7 +158,6 @@ Réponds de façon claire, experte, localisée et agréable à lire.
             st.rerun()
         except Exception as e:
             st.error(f"❌ Erreur : {e}")
-
 
 st.markdown("</div>", unsafe_allow_html=True)
 
