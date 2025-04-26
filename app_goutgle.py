@@ -117,13 +117,13 @@ if uploaded_file:
 st.markdown("---")
 
 # Quatre colonnes alignées
-col1, col2, col3, col4 = st.columns([5, 2, 3, 2])
+col1, col2, col3, col4 = st.columns([5, 1.5, 2, 2])
 
 with col1:
     question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)")
 
 with col2:
-    use_web = st.checkbox("🔎 Recherche web", value=False)
+    use_web = st.checkbox("🔎 Web", value=False, help="Inclure une recherche internet")
 
 with col3:
     uploaded_file = st.file_uploader("📁", type=["txt", "pdf", "png", "jpg", "jpeg"], label_visibility="collapsed")
@@ -149,7 +149,7 @@ if uploaded_file:
         st.warning("❗ Format de fichier non supporté pour l'instant.")
 
 with col4:
-    if st.button("Demander à Goût-gle") and question:
+    if st.button("🚀 Demander à Goût-gle") and question:
         local_context = find_relevant_context(question)
         web_context = search_web(question) if use_web else ""
 
@@ -181,7 +181,6 @@ Réponds de façon claire, experte, localisée et agréable à lire.
                 st.rerun()
             except Exception as e:
                 st.error(f"❌ Erreur : {e}")
-
 
 
 # 🧼 Sidebar reset
