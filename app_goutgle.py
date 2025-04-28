@@ -136,7 +136,8 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
           "role": "user",
           "content": [
               {"type": "text", "text": "Voici une image liée à la question, analyse-la :"},
-              {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_base64}"}
+              {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}}
+
           ]
        })
 
