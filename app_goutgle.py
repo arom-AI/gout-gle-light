@@ -48,20 +48,32 @@ def find_relevant_context(question):
     return "\n".join(results[:3])
 
 # 🌐 Recherche web (SerpAPI) avec liens
-def search_web(query):
-    search = GoogleSearch({
-        "q": query + " site:.ch",
-        "api_key": env_serpapi_key,
-        "num": 5,
-        "hl": "fr"
-    })
-    results = search.get_dict()
-    passages = []
-    if "organic_results" in results:
-        for res in results["organic_results"]:
-            if "snippet" in res and "link" in res:
-                passages.append(f"{res['snippet']}\n🔗 {res['link']}")
-    return "\n\n".join(passages[:3])
+def search_web(query, force_general=False):
+    results = []
+    wine_keywords = ["vin", "château", "millésime", "cuvée", "grand cru", "appellation"]
+
+    if any(word in query.lower() for word in wine_keywords) and not force_general:
+        # Si c'est probablement un vin, viser Vivino + Wine-Searcher
+        sites = ["vivino.com", "wine-searcher.com"]
+    else:
+        # Sinon, recherche classique sur tout internet
+        sites = [""]
+
+    for site in sites:
+        search_query = f"{query} site:{site}" if site else query
+        search = GoogleSearch({
+            "q": search_query,
+            "api_key": env_serpapi_key,
+            "num": 3,
+            "hl": "fr"
+        })
+        data = search.get_dict()
+        if "organic_results" in data:
+            for res in data["organic_results"]:
+                if "snippet" in res and "link" in res:
+                    results.append(f"{res['snippet']}\n🔗 {res['link']}")
+    return "\n\n".join(results[:6])
+
 
 # 🧠 Initialisation de l'historique
 if "history" not in st.session_state:
