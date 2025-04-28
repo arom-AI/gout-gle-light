@@ -187,12 +187,7 @@ if ask_button and question:
         questions.append("Quel est le degré d'alcool indiqué ?")
 
     st.session_state.questions_a_poser = questions
-
-            vision_response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": vision_request}],
-                temperature=0
-            )
+            
             extracted_text = vision_response.choices[0].message.content.strip()
             auto_web_context = search_web(extracted_text) if extracted_text else ""
 
