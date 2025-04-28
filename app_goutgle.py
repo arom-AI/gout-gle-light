@@ -81,6 +81,17 @@ if "history" not in st.session_state:
         {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu privilégies les sources locales (.ch), donnes les prix en CHF, et fournis les URLs quand tu trouves des références. Donne des réponses précises, agréables et claires."}
     ]
 
+if "questions_a_poser" not in st.session_state:
+    st.session_state.questions_a_poser = []
+
+if "reponses_questions" not in st.session_state:
+    st.session_state.reponses_questions = {}
+
+if "generer_reponse" not in st.session_state:
+    st.session_state.generer_reponse = False
+
+
+
 # 💬 Affichage de la conversation
 st.markdown("## 💬 Conversation")
 for msg in st.session_state.history[1:]:
@@ -102,6 +113,18 @@ for msg in st.session_state.history[1:]:
 
 # 🧾 Entrée utilisateur
 st.markdown("---")
+
+if st.session_state.questions_a_poser:
+    st.markdown("### 🛠️ Merci de compléter :")
+    for idx, question_text in enumerate(st.session_state.questions_a_poser):
+        response = st.text_input(question_text, key=f"question_{idx}")
+        st.session_state.reponses_questions[idx] = response
+
+    if st.button("📜 Générer la fiche complète"):
+        st.session_state.generer_reponse = True
+else:
+    st.session_state.generer_reponse = False
+
 
 # Barre de question
 question = st.text_input("❓ Ta question (ex : Quel vin avec une raclette ?)", key="question_input")
@@ -126,49 +149,47 @@ if ask_button and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
 
-    messages = [
-        {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique et œnologue. Tu cherches toujours la précision absolue, et tu refuses d'inventer ou supposer des informations."},
-        {"role": "user", "content": f"""
-Voici la question utilisateur : {question}
+    st.session_state.messages = [
+        {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse, ultra rigoureux."},
+        {"role": "user", "content": f"Question : {question}\n\nContexte interne : {local_context}\n\nContexte web : {web_context}"}
+    ]
 
-Voici des extraits internes :
-{local_context}
+    infos_detectees = []
 
-Voici les recherches web :
-{web_context}
+    if uploaded_image:
+        image_bytes = uploaded_image.read()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        data_url = f"data:image/jpeg;base64,{image_base64}"
 
-Voici l'image jointe.
+        vision_request = [
+            {"type": "text", "text": "Donne-moi juste : nom exact, couleur (si visible), millésime, appellation (si visible)"},
+            {"type": "image_url", "image_url": {"url": data_url}}
+        ]
 
-**IMPORTANT :**
+        try:
+            vision_response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": vision_request}],
+                temperature=0
+            )
+            infos_detectees = vision_response.choices[0].message.content.strip().lower()
 
-- Si tu ne peux PAS déterminer la couleur du vin (blanc, rosé, rouge) → demande immédiatement la confirmation à l'utilisateur.
-- Si le degré d'alcool, l'appellation précise ou les cépages ne sont PAS visibles ou trouvés → pose la question clairement et poliment avant de continuer.
-- Si l'image est floue, trop générique ou pas assez précise → préviens l'utilisateur et demande plus d'éléments.
-- Tu NE DOIS PAS supposer par défaut des informations critiques (pas d'inventions !).
+        except Exception as e:
+            st.warning(f"❗ Impossible d'analyser l'image : {e}")
 
-Ta réponse suit cette trame :
+    # 🧠 Analyser ce qu'on a détecté
+    questions = []
+    if "rouge" not in infos_detectees and "blanc" not in infos_detectees and "rosé" not in infos_detectees:
+        questions.append("Peux-tu préciser si c'est un vin rouge, blanc ou rosé ?")
 
-1. **📋 Présentation générale** (Type exact de produit, nom complet, producteur)
-2. **🏷️ Détails visibles sur l'étiquette** (millésime, mentions spéciales, degré si lisible)
-3. **🌍 Origine & Terroir** (région, appellation, climat, sols, influences locales)
-4. **🍇 Cépages utilisés** (ou demande confirmation si non visible)
-5. **🥂 Profil gustatif** (nez précis, bouche précise, texture)
-6. **🍽️ Accords mets ultra adaptés** (liés aux arômes du vin, précis)
-7. **🔥 Conseils de dégustation** (température, carafage, etc.)
-8. **💰 Fourchette de prix indicative** (si trouvable)
-9. **🕰️ Potentiel de garde**
-10. **🔍 Informations complémentaires** (anecdotes sur le domaine, méthode de vinif)
+    if "appellation" not in infos_detectees:
+        questions.append("Peux-tu préciser l'appellation exacte du vin ?")
 
-**Si tu es bloqué pour continuer à rédiger la fiche car il manque une information essentielle, STOPPE la réponse et demande la précision à l'utilisateur.**
+    if "degré" not in infos_detectees and "%" not in infos_detectees:
+        questions.append("Quel est le degré d'alcool indiqué ?")
 
-Ta priorité est :
-- La rigueur ✅
-- La politesse ✅
-- La transparence ("Je ne peux pas préciser X sans votre confirmation") ✅
+    st.session_state.questions_a_poser = questions
 
-Sois engageant, accessible, et agréable à lire.
-"""}
-]
 
     if uploaded_image:
         image_bytes = uploaded_image.read()
@@ -270,17 +291,31 @@ Rédige ensuite une fiche ultra complète en suivant cette structure :
 
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
+        if "generer_reponse" in st.session_state and st.session_state.generer_reponse:
+    # Ajoutons les réponses de l'utilisateur dans le prompt
+    infos_complementaires = "\n".join(
+        f"- {st.session_state.reponses_questions[idx]}" for idx in st.session_state.reponses_questions
+    )
+
+    st.session_state.messages.append(
+        {"role": "user", "content": f"Voici les précisions utilisateur manquantes :\n{infos_complementaires}\n\nGénère maintenant la fiche complète ultra détaillée."}
+    )
+
+    with st.spinner("Goût-gle compile toutes les informations... 🍷"):
         try:
             response = client.chat.completions.create(
                 model="gpt-4o",
-                messages=messages,
+                messages=st.session_state.messages,
                 temperature=0.7
             )
             answer = response.choices[0].message.content.strip()
             st.session_state.history.append({"role": "assistant", "content": answer})
+            st.session_state.questions_a_poser = []
+            st.session_state.reponses_questions = {}
             st.rerun()
         except Exception as e:
             st.error(f"❌ Erreur : {e}")
+
 
 
 st.markdown("</div>", unsafe_allow_html=True)
