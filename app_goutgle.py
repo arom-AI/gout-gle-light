@@ -133,12 +133,13 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
         image_bytes = uploaded_image.read()
         image_base64 = base64.b64encode(image_bytes).decode('utf-8')
         messages.append({
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "Voici une image liée à la question, analyse-la :"},
-                {"type": "image", "image": {"base64": image_base64, "mime_type": "image/jpeg"}}
-            ]
-        })
+          "role": "user",
+          "content": [
+              {"type": "text", "text": "Voici une image liée à la question, analyse-la :"},
+              {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_base64}"}
+          ]
+       })
+
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
         try:
