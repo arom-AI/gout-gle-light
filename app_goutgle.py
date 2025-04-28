@@ -182,37 +182,34 @@ if ask_button and question:
         except Exception as e:
             st.warning(f"❗ Impossible d'analyser l'image : {e}")
 
+    # 🧠 Maintenant générer les questions complémentaires
+    questions = []
+    if "rouge" not in infos_detectees and "blanc" not in infos_detectees and "rosé" not in infos_detectees:
+        questions.append("Peux-tu préciser si c'est un vin rouge, blanc ou rosé ?")
 
+    if "appellation" not in infos_detectees:
+        questions.append("Peux-tu préciser l'appellation exacte du vin ?")
 
-        # 🧠 Maintenant générer les questions complémentaires
-        questions = []
-        if "rouge" not in infos_detectees and "blanc" not in infos_detectees and "rosé" not in infos_detectees:
-            questions.append("Peux-tu préciser si c'est un vin rouge, blanc ou rosé ?")
+    if "degré" not in infos_detectees and "%" not in infos_detectees:
+        questions.append("Quel est le degré d'alcool indiqué ?")
 
-        if "appellation" not in infos_detectees:
-            questions.append("Peux-tu préciser l'appellation exacte du vin ?")
+    st.session_state.questions_a_poser = questions
 
-        if "degré" not in infos_detectees and "%" not in infos_detectees:
-            questions.append("Quel est le degré d'alcool indiqué ?")
+    # ⬇️ ATTENTION, ce bloc doit être là, juste après avoir fini de chercher les questions
+    if not st.session_state.questions_a_poser:
+        try:
+            with st.spinner("Goût-gle rédige une réponse initiale... 🍷"):
+                response = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=st.session_state.messages,
+                    temperature=0.7
+                )
+                answer = response.choices[0].message.content.strip()
 
-        st.session_state.questions_a_poser = questions
+                st.session_state.history.append({"role": "assistant", "content": answer})
 
-                # ⬇️ AJOUTE ICI ce nouveau bloc :
-        if not st.session_state.questions_a_poser:
-             try:
-                 with st.spinner("Goût-gle rédige une réponse initiale... 🍷"):
-                     response = client.chat.completions.create(
-                         model="gpt-4o",
-                         messages=st.session_state.messages,
-                         temperature=0.7
-                     )
-                     answer = response.choices[0].message.content.strip()
-
-                     st.session_state.history.append({"role": "assistant", "content": answer})
-
-           except Exception as e:
-               st.error(f"❌ Erreur lors de la réponse initiale : {e}")
-
+        except Exception as e:
+            st.error(f"❌ Erreur lors de la réponse initiale : {e}")
 
 
 with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
