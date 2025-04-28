@@ -7,6 +7,7 @@ from serpapi import GoogleSearch
 from PyPDF2 import PdfReader
 from PIL import Image
 import pytesseract
+import base64
 
 # 🌍 Activation de la recherche web (via checkbox)
 st.set_page_config(page_title="Goût-gle", page_icon="🍷")
@@ -128,14 +129,19 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
 """}
     ]
 
-    if uploaded_image:
-        messages.append({
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "Voici une image liée à la question, analyse-la :"},
-                {"type": "image", "image": {"data": uploaded_image.read()}}
-            ]
-        })
+if uploaded_image:
+    # Lire et encoder l'image en base64
+    image_bytes = uploaded_image.read()
+    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+
+    # Ajouter l'image au message sous la forme attendue par OpenAI
+    messages.append({
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Voici une image liée à la question, analyse-la :"},
+            {"type": "image", "image": {"base64": image_base64, "mime_type": "image/jpeg"}}
+        ]
+    })
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
         try:
