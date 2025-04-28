@@ -197,6 +197,23 @@ if ask_button and question:
 
         st.session_state.questions_a_poser = questions
 
+                # ⬇️ AJOUTE ICI ce nouveau bloc :
+        if not st.session_state.questions_a_poser:
+             try:
+                 with st.spinner("Goût-gle rédige une réponse initiale... 🍷"):
+                     response = client.chat.completions.create(
+                         model="gpt-4o",
+                         messages=st.session_state.messages,
+                         temperature=0.7
+                     )
+                     answer = response.choices[0].message.content.strip()
+
+                     st.session_state.history.append({"role": "assistant", "content": answer})
+
+           except Exception as e:
+               st.error(f"❌ Erreur lors de la réponse initiale : {e}")
+
+
 
 with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
     if st.session_state.generer_reponse:
