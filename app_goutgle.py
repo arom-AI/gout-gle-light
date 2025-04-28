@@ -132,6 +132,27 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
     if uploaded_image:  # <-- À l'intérieur du if ask_button and question
         image_bytes = uploaded_image.read()
         image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+            # Extraire rapidement une description depuis l'image
+    try:
+        vision_request = [
+            {"type": "text", "text": "Décris ce que tu vois sur cette image."},
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}}
+        ]
+
+        vision_response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": vision_request}],
+            temperature=0
+        )
+        extracted_text = vision_response.choices[0].message.content.strip()
+
+        # Recherche web automatique basée sur la description extraite
+        auto_web_context = search_web(extracted_text) if extracted_text else ""
+    except Exception as e:
+        extracted_text = ""
+        auto_web_context = ""
+        st.warning(f"❗ Impossible d'analyser l'image automatiquement : {e}")
+
         messages.append({
           "role": "user",
           "content": [
@@ -139,6 +160,9 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
 
 Décris précisément ce que tu identifies (bouteille, étiquette, marque, type de boisson, informations visibles).
 Base-toi uniquement sur ce que tu vois pour répondre.
+
+Voici aussi des informations supplémentaires trouvées automatiquement sur Internet :
+{auto_web_context}
 
 Puis, en fonction du produit reconnu, fournis une réponse complète et adaptée :
 - S'il s'agit d'un vin :
