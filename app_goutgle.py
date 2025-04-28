@@ -188,8 +188,8 @@ if ask_button and question:
 
     st.session_state.questions_a_poser = questions
             
-            extracted_text = vision_response.choices[0].message.content.strip()
-            auto_web_context = search_web(extracted_text) if extracted_text else ""
+        extracted_text = vision_response.choices[0].message.content.strip()
+        auto_web_context = search_web(extracted_text) if extracted_text else ""
 
         except Exception as e:
             extracted_text = ""
