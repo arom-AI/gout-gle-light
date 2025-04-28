@@ -105,64 +105,43 @@ with col2:
 with col3:
     toggle_upload = st.checkbox("➕", key="toggle_upload", label_visibility="collapsed")
 
-# Si toggle activé ➡️ afficher le file uploader
-uploaded_content = ""
+uploaded_image = None
 if toggle_upload:
-    uploaded_file = st.file_uploader("📁 Uploade ton fichier (.txt, .pdf, .jpg, .png)", type=["txt", "pdf", "png", "jpg", "jpeg"])
-    
-    if uploaded_file:
-        file_extension = uploaded_file.name.split(".")[-1].lower()
+    uploaded_image = st.file_uploader("📁 Uploade ton fichier image (.jpg, .jpeg, .png)", type=["jpg", "jpeg", "png"])
 
-        if file_extension == "txt":
-            uploaded_content = uploaded_file.read().decode("utf-8")
-        elif file_extension == "pdf":
-            pdf_reader = PdfReader(uploaded_file)
-            for page in pdf_reader.pages:
-                uploaded_content += page.extract_text()
-        elif file_extension in ["jpg", "jpeg", "png"]:
-            image = Image.open(uploaded_file)
-            try:
-                uploaded_content = pytesseract.image_to_string(image, lang="eng+fra")
-            except pytesseract.TesseractNotFoundError:
-                st.error("❌ Tesseract OCR n'est pas installé correctement.")
-            except pytesseract.TesseractError:
-           # Si la langue fra n'est pas installée, fallback en anglais seulement
-                uploaded_content = pytesseract.image_to_string(image, lang="eng")
-
-   
-
-        else:
-            st.warning("❗ Format de fichier non supporté pour l'instant.")
-
-# Quand on clique sur Demander à Goût-gle
 if ask_button and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
 
-    prompt = f"""
-Voici la question de l'utilisateur : {question}
+    messages = [
+        {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu analyses vins, plats et accords."},
+        {"role": "user", "content": f"""
+Voici la question : {question}
 
-Utilise toutes les informations suivantes pour répondre :
-
-- 📚 Documents internes pertinents :
+Voici des extraits internes :
 {local_context}
 
-- 🌍 Résultats web récents :
+Voici des recherches web :
 {web_context}
 
-- 🖼️ Texte extrait de l'image ou du fichier uploadé :
-{uploaded_content}
+Si une image est jointe, analyse-la pour extraire toute information pertinente.
+"""}
+    ]
 
-Si du texte est disponible depuis l'image ou le fichier, analyse-le et utilise-le en priorité pour ta réponse. Sinon, utilise les autres sources. Réponds de manière experte, détaillée et agréable à lire.
-"""
-
-    st.session_state.history.append({"role": "user", "content": question})
+    if uploaded_image:
+        messages.append({
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Voici une image liée à la question, analyse-la :"},
+                {"type": "image", "image": {"data": uploaded_image.read()}}
+            ]
+        })
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
         try:
             response = client.chat.completions.create(
-                model="gpt-4",
-                messages=st.session_state.history + [{"role": "user", "content": prompt}],
+                model="gpt-4-vision-preview",  # modèle qui peut lire les images
+                messages=messages,
                 temperature=0.7
             )
             answer = response.choices[0].message.content.strip()
