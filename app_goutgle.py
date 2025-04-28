@@ -160,13 +160,51 @@ Si une image est jointe, analyse-la aussi pour extraire toute information pertin
 
 Décris précisément ce que tu identifies (bouteille, étiquette, marque, type de boisson, informations visibles).
 
-Voici aussi des informations complémentaires trouvées automatiquement :
+Voici aussi des informations trouvées automatiquement sur Internet :
 {auto_web_context}
 
-Puis, donne une réponse détaillée adaptée au type de produit."""},
-                {"type": "image_url", "image_url": {"url": data_url}}
-            ]
-        })
+Puis, rédige une fiche ultra complète en suivant cette structure :
+
+1. 📋 **Présentation générale**
+   - Type exact de produit (vin, spiritueux, bière, soft, autre)
+   - Nom du produit ou de la marque
+   - Producteur / Domaine / Distillerie
+
+2. 🏷️ **Détails visibles**
+   - Millésime (si vin)
+   - Cuvée / Edition spéciale / Mention spécifique
+   - Informations affichées (alcool, origine, certification…)
+
+3. 🌍 **Origine**
+   - Région de production
+   - Terroir ou appellation (si applicable)
+
+4. 🥂 **Profil gustatif attendu**
+   - Arômes dominants (nez)
+   - Saveurs principales (bouche)
+   - Texture, longueur en bouche
+
+5. 🍽️ **Accords recommandés**
+   - Mets idéaux pour accompagner ce produit
+
+6. 🔥 **Conseils de consommation**
+   - Température de service
+   - Astuces de dégustation (carafer, pur, avec glace…)
+
+7. 💰 **Fourchette de prix indicative**
+   - (Basée sur une recherche rapide si disponible)
+
+8. 🕰️ **Potentiel de garde** (si vin ou spiritueux)
+
+9. 🔍 **Informations complémentaires**
+   - Histoire éventuelle du producteur
+   - Anecdotes ou caractéristiques notables
+
+Reste naturel, expert et agréable à lire. Utilise des émojis de contexte sans abuser. Sois très précis et rigoureux."""},
+        {"type": "image_url", "image_url": {"url": data_url}}
+    ]
+})
+
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
         try:
