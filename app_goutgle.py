@@ -156,13 +156,14 @@ if ask_button and question:
 
     infos_detectees = []
 
+    # 🖼️ Analyse image seulement ici
     if uploaded_image:
         image_bytes = uploaded_image.read()
 
         vision_request = [
             {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
             {"type": "image", "image": {"data": image_bytes, "mime_type": "image/jpeg"}}
-    ]
+        ]
 
         try:
             vision_response = client.chat.completions.create(
@@ -175,109 +176,28 @@ if ask_button and question:
         except Exception as e:
             st.warning(f"❗ Impossible d'analyser l'image : {e}")
 
-    # 🧠 Analyser ce qu'on a détecté
-    questions = []
-    if "rouge" not in infos_detectees and "blanc" not in infos_detectees and "rosé" not in infos_detectees:
-        questions.append("Peux-tu préciser si c'est un vin rouge, blanc ou rosé ?")
+        # 🧠 Maintenant générer les questions complémentaires
+        questions = []
+        if "rouge" not in infos_detectees and "blanc" not in infos_detectees and "rosé" not in infos_detectees:
+            questions.append("Peux-tu préciser si c'est un vin rouge, blanc ou rosé ?")
 
-    if "appellation" not in infos_detectees:
-        questions.append("Peux-tu préciser l'appellation exacte du vin ?")
+        if "appellation" not in infos_detectees:
+            questions.append("Peux-tu préciser l'appellation exacte du vin ?")
 
-    if "degré" not in infos_detectees and "%" not in infos_detectees:
-        questions.append("Quel est le degré d'alcool indiqué ?")
+        if "degré" not in infos_detectees and "%" not in infos_detectees:
+            questions.append("Quel est le degré d'alcool indiqué ?")
 
-    st.session_state.questions_a_poser = questions
-            
-        extracted_text = vision_response.choices[0].message.content.strip()
-        auto_web_context = search_web(extracted_text) if extracted_text else ""
-
-        except Exception as e:
-            extracted_text = ""
-            auto_web_context = ""
-            st.warning(f"❗ Impossible d'analyser l'image automatiquement : {e}")
-
-        st.session_state.messages.append({
-            "role": "user",
-            "content": [
-                {"type": "text", "text": f"""Voici une image d'un produit lié au monde de la boisson ou de l'alimentation. Analyse-la attentivement.
- 
-**Partie 1 : Extraction visuelle**
-- Décris précisément ce que tu vois sur l'étiquette (nom, millésime, appellation, mentions spéciales).
-- Ne fais aucune supposition non visible.
-
-**Partie 2 : Recherche d'informations supplémentaires**
-Voici aussi des informations trouvées automatiquement sur Internet concernant ce produit :
-{auto_web_context}
-
-Base-toi dessus pour :
-- Retrouver l'origine exacte (région, terroir).
-- Identifier le cépage ou les assemblages si possible.
-- Préciser l'histoire du domaine.
-- Mieux comprendre le style du vin ou du spiritueux.
-
-**Partie 3 : Fiche détaillée**
-Rédige ensuite une fiche ultra complète en suivant cette structure :
-
-📋 Présentation générale
-- Type exact de produit
-- Nom complet
-- Producteur / Domaine
-
-🏷️ Détails visibles
-- Millésime
-- Cuvée / Edition spéciale
-- Degré alcoolique (si disponible)
-
-🌍 Origine
-- Région
-- Appellation précise (AOC, IGP...)
-
-🍇 Cépages utilisés
-- Liste les cépages principaux s'ils sont connus
-
-🥂 Profil gustatif
-- Arômes au nez
-- Saveurs principales en bouche
-- Texture, équilibre, longueur
-
-🍽️ Accords mets et vins ultra précis
-- 3 exemples bien adaptés en fonction du profil aromatique
-
-🔥 Conseils de dégustation
-- Température optimale
-- Nécessité ou non de carafer
-
-💰 Fourchette de prix estimée
-- En fonction de la rareté et du millésime
-
-🕰️ Potentiel de garde
-- Indique si le produit doit être bu jeune ou peut vieillir
-
-🔍 Informations complémentaires
-- Anecdotes sur le domaine
-- Particularités de vinification
-- Distinctions éventuelles (médailles, critiques)
-
-**Style d'écriture :**
-- Clair, structuré avec bullet points
-- Ton expert mais accessible
-- Utilisation modérée d'émojis contextuels
-
-**Important :**
-- Si certaines informations manquent malgré l'analyse web, indique "Non précisé" plutôt que d'inventer."""},
-        {"type": "image_url", "image_url": {"url": data_url}}
-    ]
-})
-
+        st.session_state.questions_a_poser = questions
 
 
 with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
-    if "generer_reponse" in st.session_state and st.session_state.generer_reponse:
-        # Ajoutons les réponses de l'utilisateur dans le prompt
+    if st.session_state.generer_reponse:
+        # Ajoutons les réponses utilisateur dans le prompt
         infos_complementaires = "\n".join(
             f"- {st.session_state.reponses_questions[idx]}" for idx in st.session_state.reponses_questions
         )
 
+        # On rajoute les infos complémentaires à notre conversation
         st.session_state.messages.append(
             {"role": "user", "content": f"Voici les précisions utilisateur manquantes :\n{infos_complementaires}\n\nGénère maintenant la fiche complète ultra détaillée."}
         )
@@ -290,13 +210,16 @@ with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
                     temperature=0.7
                 )
                 answer = response.choices[0].message.content.strip()
+
                 st.session_state.history.append({"role": "assistant", "content": answer})
                 st.session_state.questions_a_poser = []
                 st.session_state.reponses_questions = {}
                 st.session_state.generer_reponse = False
+
                 st.rerun()
             except Exception as e:
-                st.error(f"❌ Erreur : {e}")
+                st.error(f"❌ Erreur lors de la réponse complète : {e}")
+
 
 
 
