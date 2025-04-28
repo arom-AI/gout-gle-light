@@ -293,7 +293,7 @@ Rédige ensuite une fiche ultra complète en suivant cette structure :
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
         if "generer_reponse" in st.session_state and st.session_state.generer_reponse:
     # Ajoutons les réponses de l'utilisateur dans le prompt
-    infos_complementaires = "\n".join(
+        infos_complementaires = "\n".join(
         f"- {st.session_state.reponses_questions[idx]}" for idx in st.session_state.reponses_questions
     )
 
