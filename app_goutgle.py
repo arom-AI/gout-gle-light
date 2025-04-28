@@ -188,18 +188,6 @@ if ask_button and question:
 
     st.session_state.questions_a_poser = questions
 
-
-    if uploaded_image:
-        image_bytes = uploaded_image.read()
-        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-        data_url = f"data:image/jpeg;base64,{image_base64}"
-
-        try:
-            vision_request = [
-                {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
-                {"type": "image_url", "image_url": {"url": data_url}}
-            ]
-
             vision_response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[{"role": "user", "content": vision_request}],
