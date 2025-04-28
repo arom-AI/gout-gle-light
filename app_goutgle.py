@@ -207,6 +207,8 @@ if ask_button and question:
                 answer = response.choices[0].message.content.strip()
 
                 st.session_state.history.append({"role": "assistant", "content": answer})
+                st.rerun()  # 👈 AJOUTE CE RERUN ICI !
+
 
         except Exception as e:
             st.error(f"❌ Erreur lors de la réponse initiale : {e}")
