@@ -157,53 +157,75 @@ Si une image est jointe, analyse-la aussi pour extraire toute information pertin
             "role": "user",
             "content": [
                 {"type": "text", "text": f"""Voici une image d'un produit lié au monde de la boisson ou de l'alimentation. Analyse-la attentivement.
+ 
+**Partie 1 : Extraction visuelle**
+- Décris précisément ce que tu vois sur l'étiquette (nom, millésime, appellation, mentions spéciales).
+- Ne fais aucune supposition non visible.
 
-Décris précisément ce que tu identifies (bouteille, étiquette, marque, type de boisson, informations visibles).
-
-Voici aussi des informations trouvées automatiquement sur Internet :
+**Partie 2 : Recherche d'informations supplémentaires**
+Voici aussi des informations trouvées automatiquement sur Internet concernant ce produit :
 {auto_web_context}
 
-Puis, rédige une fiche ultra complète en suivant cette structure :
+Base-toi dessus pour :
+- Retrouver l'origine exacte (région, terroir).
+- Identifier le cépage ou les assemblages si possible.
+- Préciser l'histoire du domaine.
+- Mieux comprendre le style du vin ou du spiritueux.
 
-1. 📋 **Présentation générale**
-   - Type exact de produit (vin, spiritueux, bière, soft, autre)
-   - Nom du produit ou de la marque
-   - Producteur / Domaine / Distillerie
+**Partie 3 : Fiche détaillée**
+Rédige ensuite une fiche ultra complète en suivant cette structure :
 
-2. 🏷️ **Détails visibles**
-   - Millésime (si vin)
-   - Cuvée / Edition spéciale / Mention spécifique
-   - Informations affichées (alcool, origine, certification…)
+📋 Présentation générale
+- Type exact de produit
+- Nom complet
+- Producteur / Domaine
 
-3. 🌍 **Origine**
-   - Région de production
-   - Terroir ou appellation (si applicable)
+🏷️ Détails visibles
+- Millésime
+- Cuvée / Edition spéciale
+- Degré alcoolique (si disponible)
 
-4. 🥂 **Profil gustatif attendu**
-   - Arômes dominants (nez)
-   - Saveurs principales (bouche)
-   - Texture, longueur en bouche
+🌍 Origine
+- Région
+- Appellation précise (AOC, IGP...)
 
-5. 🍽️ **Accords recommandés**
-   - Mets idéaux pour accompagner ce produit
+🍇 Cépages utilisés
+- Liste les cépages principaux s'ils sont connus
 
-6. 🔥 **Conseils de consommation**
-   - Température de service
-   - Astuces de dégustation (carafer, pur, avec glace…)
+🥂 Profil gustatif
+- Arômes au nez
+- Saveurs principales en bouche
+- Texture, équilibre, longueur
 
-7. 💰 **Fourchette de prix indicative**
-   - (Basée sur une recherche rapide si disponible)
+🍽️ Accords mets et vins ultra précis
+- 3 exemples bien adaptés en fonction du profil aromatique
 
-8. 🕰️ **Potentiel de garde** (si vin ou spiritueux)
+🔥 Conseils de dégustation
+- Température optimale
+- Nécessité ou non de carafer
 
-9. 🔍 **Informations complémentaires**
-   - Histoire éventuelle du producteur
-   - Anecdotes ou caractéristiques notables
+💰 Fourchette de prix estimée
+- En fonction de la rareté et du millésime
 
-Reste naturel, expert et agréable à lire. Utilise des émojis de contexte sans abuser. Sois très précis et rigoureux."""},
+🕰️ Potentiel de garde
+- Indique si le produit doit être bu jeune ou peut vieillir
+
+🔍 Informations complémentaires
+- Anecdotes sur le domaine
+- Particularités de vinification
+- Distinctions éventuelles (médailles, critiques)
+
+**Style d'écriture :**
+- Clair, structuré avec bullet points
+- Ton expert mais accessible
+- Utilisation modérée d'émojis contextuels
+
+**Important :**
+- Si certaines informations manquent malgré l'analyse web, indique "Non précisé" plutôt que d'inventer."""},
         {"type": "image_url", "image_url": {"url": data_url}}
     ]
 })
+
 
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
