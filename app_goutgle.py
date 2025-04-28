@@ -129,7 +129,7 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
 """}
     ]
 
-    if uploaded_image:
+if uploaded_image:
     image_bytes = uploaded_image.read()
     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
     data_url = f"data:image/jpeg;base64,{image_base64}"
@@ -172,6 +172,7 @@ Puis, fournis une réponse complète adaptée selon le type de produit."""},
             {"type": "image_url", "image_url": data_url}
         ]
     })
+
 
 
 
