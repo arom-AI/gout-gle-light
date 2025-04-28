@@ -139,20 +139,23 @@ if ask_button and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
 
-    prompt = f"""
-Voici une question : {question}
+prompt = f"""
+Voici la question de l'utilisateur : {question}
 
-Voici des extraits de documents pour t'aider :
+Utilise toutes les informations suivantes pour répondre :
+
+- 📚 Documents internes pertinents :
 {local_context}
 
-Résultats de recherche web récents :
+- 🌍 Résultats web récents :
 {web_context}
 
-Contenu extrait du fichier uploadé :
+- 🖼️ Texte extrait de l'image ou du fichier uploadé :
 {uploaded_content}
 
-Réponds de façon claire, experte, localisée et agréable à lire.
+Si du texte est disponible depuis l'image ou le fichier, analyse-le et utilise-le en priorité pour ta réponse. Sinon, utilise les autres sources. Réponds de manière experte, détaillée et agréable à lire.
 """
+
     st.session_state.history.append({"role": "user", "content": question})
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
