@@ -158,13 +158,11 @@ if ask_button and question:
 
     if uploaded_image:
         image_bytes = uploaded_image.read()
-        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-        data_url = f"data:image/jpeg;base64,{image_base64}"
 
         vision_request = [
-            {"type": "text", "text": "Donne-moi juste : nom exact, couleur (si visible), millésime, appellation (si visible)"},
-            {"type": "image_url", "image_url": {"url": data_url}}
-        ]
+            {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
+            {"type": "image", "image": {"data": image_bytes, "mime_type": "image/jpeg"}}
+    ]
 
         try:
             vision_response = client.chat.completions.create(
