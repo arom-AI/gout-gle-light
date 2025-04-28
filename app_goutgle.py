@@ -215,7 +215,7 @@ if ask_button and question:
             auto_web_context = ""
             st.warning(f"❗ Impossible d'analyser l'image automatiquement : {e}")
 
-        messages.append({
+        st.session_state.messages.append({
             "role": "user",
             "content": [
                 {"type": "text", "text": f"""Voici une image d'un produit lié au monde de la boisson ou de l'alimentation. Analyse-la attentivement.
