@@ -135,13 +135,13 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
         messages.append({
           "role": "user",
           "content": [
-              {"type": "text", "text": "Voici une image d'un produit lié au monde de la boisson ou de l'alimentation. Analyse-la attentivement.
+              {"type": "text", "text": """Voici une image d'un produit lié au monde de la boisson ou de l'alimentation. Analyse-la attentivement.
 
-Décris précisément ce que tu identifies (bouteille, étiquette, marque, type de boisson, informations visibles). 
+Décris précisément ce que tu identifies (bouteille, étiquette, marque, type de boisson, informations visibles).
 Base-toi uniquement sur ce que tu vois pour répondre.
 
 Puis, en fonction du produit reconnu, fournis une réponse complète et adaptée :
-- S'il s'agit d'un vin : 
+- S'il s'agit d'un vin :
   - Domaine, cuvée, millésime, mention spéciale
   - Histoire éventuelle du domaine
   - Qualité du millésime
@@ -177,7 +177,8 @@ Puis, en fonction du produit reconnu, fournis une réponse complète et adaptée
   - Ne fais pas d'hypothèses hasardeuses.
 
 Reste clair, structuré et agréable à lire. Utilise si possible des bullet points pour rendre la lecture facile.
-"},
+"""}
+
               {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}}
 
           ]
