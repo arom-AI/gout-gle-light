@@ -290,31 +290,33 @@ Rédige ensuite une fiche ultra complète en suivant cette structure :
 
 
 
-    with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
-        if "generer_reponse" in st.session_state and st.session_state.generer_reponse:
-    # Ajoutons les réponses de l'utilisateur dans le prompt
+with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
+    if "generer_reponse" in st.session_state and st.session_state.generer_reponse:
+        # Ajoutons les réponses de l'utilisateur dans le prompt
         infos_complementaires = "\n".join(
-        f"- {st.session_state.reponses_questions[idx]}" for idx in st.session_state.reponses_questions
-    )
+            f"- {st.session_state.reponses_questions[idx]}" for idx in st.session_state.reponses_questions
+        )
 
-    st.session_state.messages.append(
-        {"role": "user", "content": f"Voici les précisions utilisateur manquantes :\n{infos_complementaires}\n\nGénère maintenant la fiche complète ultra détaillée."}
-    )
+        st.session_state.messages.append(
+            {"role": "user", "content": f"Voici les précisions utilisateur manquantes :\n{infos_complementaires}\n\nGénère maintenant la fiche complète ultra détaillée."}
+        )
 
-    with st.spinner("Goût-gle compile toutes les informations... 🍷"):
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=st.session_state.messages,
-                temperature=0.7
-            )
-            answer = response.choices[0].message.content.strip()
-            st.session_state.history.append({"role": "assistant", "content": answer})
-            st.session_state.questions_a_poser = []
-            st.session_state.reponses_questions = {}
-            st.rerun()
-        except Exception as e:
-            st.error(f"❌ Erreur : {e}")
+        with st.spinner("Goût-gle compile toutes les informations... 🍷"):
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=st.session_state.messages,
+                    temperature=0.7
+                )
+                answer = response.choices[0].message.content.strip()
+                st.session_state.history.append({"role": "assistant", "content": answer})
+                st.session_state.questions_a_poser = []
+                st.session_state.reponses_questions = {}
+                st.session_state.generer_reponse = False
+                st.rerun()
+            except Exception as e:
+                st.error(f"❌ Erreur : {e}")
+
 
 
 
