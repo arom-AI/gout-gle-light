@@ -115,9 +115,9 @@ if ask_button and question:
     web_context = search_web(question) if use_web else ""
 
     messages = [
-        {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu analyses vins, plats et accords."},
+        {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu analyses vins, spiritueux, bières et softs de manière experte."},
         {"role": "user", "content": f"""
-Voici la question : {question}
+Voici la question de l'utilisateur : {question}
 
 Voici des extraits internes :
 {local_context}
@@ -125,56 +125,48 @@ Voici des extraits internes :
 Voici des recherches web :
 {web_context}
 
-Si une image est jointe, analyse-la pour extraire toute information pertinente.
+Si une image est jointe, analyse-la aussi pour extraire toute information pertinente.
 """}
     ]
 
-if uploaded_image:
-    image_bytes = uploaded_image.read()
-    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-    data_url = f"data:image/jpeg;base64,{image_base64}"
+    if uploaded_image:
+        image_bytes = uploaded_image.read()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        data_url = f"data:image/jpeg;base64,{image_base64}"
 
-    # 1. Tenter d'extraire du texte depuis l'image
-    try:
-        vision_request = [
-            {"type": "text", "text": "Décris ce que tu vois sur cette image."},
-            {"type": "image_url", "image_url": data_url}
-        ]
+        try:
+            vision_request = [
+                {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
+                {"type": "image_url", "image_url": {"url": data_url}}
+            ]
 
-        vision_response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": vision_request}],
-            temperature=0
-        )
-        extracted_text = vision_response.choices[0].message.content.strip()
+            vision_response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": vision_request}],
+                temperature=0
+            )
+            extracted_text = vision_response.choices[0].message.content.strip()
+            auto_web_context = search_web(extracted_text) if extracted_text else ""
 
-        # Recherche web basée sur l'extrait
-        auto_web_context = search_web(extracted_text) if extracted_text else ""
+        except Exception as e:
+            extracted_text = ""
+            auto_web_context = ""
+            st.warning(f"❗ Impossible d'analyser l'image automatiquement : {e}")
 
-    except Exception as e:
-        extracted_text = ""
-        auto_web_context = ""
-        st.warning(f"❗ Impossible d'analyser l'image automatiquement : {e}")
-
-    # 2. Maintenant qu'on a extrait et cherché, on complète le message
-    messages.append({
-        "role": "user",
-        "content": [
-            {"type": "text", "text": f"""Voici une image d'un produit lié au monde de la boisson ou de l'alimentation. Analyse-la attentivement.
+        messages.append({
+            "role": "user",
+            "content": [
+                {"type": "text", "text": f"""Voici une image d'un produit lié au monde de la boisson ou de l'alimentation. Analyse-la attentivement.
 
 Décris précisément ce que tu identifies (bouteille, étiquette, marque, type de boisson, informations visibles).
-Base-toi uniquement sur ce que tu vois pour répondre.
 
-Voici aussi des informations trouvées automatiquement sur Internet :
+Voici aussi des informations complémentaires trouvées automatiquement :
 {auto_web_context}
 
-Puis, fournis une réponse complète adaptée selon le type de produit."""},
-            {"type": "image_url", "image_url": data_url}
-        ]
-    })
-
-
-
+Puis, donne une réponse détaillée adaptée au type de produit."""},
+                {"type": "image_url", "image_url": {"url": data_url}}
+            ]
+        })
 
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
         try:
@@ -188,6 +180,7 @@ Puis, fournis une réponse complète adaptée selon le type de produit."""},
             st.rerun()
         except Exception as e:
             st.error(f"❌ Erreur : {e}")
+
 
 st.markdown("</div>", unsafe_allow_html=True)
 
