@@ -143,7 +143,7 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
     with st.spinner("Goût-gle réfléchit à une réponse raffinée... 🍷"):
         try:
             response = client.chat.completions.create(
-                model="gpt-4-vision-preview",
+                model="gpt-4o",
                 messages=messages,
                 temperature=0.7
             )
