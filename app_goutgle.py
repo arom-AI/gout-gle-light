@@ -159,7 +159,9 @@ if ask_button and question:
     # 🖼️ Analyse image seulement ici
     if uploaded_image:
         image_bytes = uploaded_image.read()
-        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        mime_type = uploaded_image.type  # Exemple 'image/jpeg' ou 'image/png'
+        base64_data = base64.b64encode(image_bytes).decode('utf-8')
+        data_url = f"data:{mime_type};base64,{base64_data}"
 
         try:
             vision_response = client.chat.completions.create(
@@ -169,17 +171,17 @@ if ask_button and question:
                         "role": "user",
                         "content": [
                             {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
-                            {"type": "image", "image": {"base64": image_base64}}
+                            {"type": "image_url", "image_url": {"url": data_url}}
                         ]
                     }
                 ],
                 temperature=0
             )
-
             infos_detectees = vision_response.choices[0].message.content.strip().lower()
 
         except Exception as e:
             st.warning(f"❗ Impossible d'analyser l'image : {e}")
+
 
 
         # 🧠 Maintenant générer les questions complémentaires
