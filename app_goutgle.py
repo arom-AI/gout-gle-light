@@ -127,19 +127,44 @@ if ask_button and question:
     web_context = search_web(question) if use_web else ""
 
     messages = [
-        {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique basé en Suisse. Tu analyses vins, spiritueux, bières et softs de manière experte."},
-        {"role": "user", "content": f"""
+    {"role": "system", "content": "Tu es Goût-gle, un expert gastronomique en boissons et produits alimentaires. Tu privilégies la précision, la rigueur, et l'excellence dans tes réponses."},
+    {"role": "user", "content": f"""
 Voici la question de l'utilisateur : {question}
 
-Voici des extraits internes :
+Voici des extraits internes pour t'aider :
 {local_context}
 
-Voici des recherches web :
+Voici des résultats web récents :
 {web_context}
 
-Si une image est jointe, analyse-la aussi pour extraire toute information pertinente.
+Voici l'image jointe : utilise ce que tu peux en tirer.
+
+Ton objectif est :
+- D'analyser l'image sans faire d'hypothèses (exemple : si la couleur du vin n'est pas visible, pose la question au lieu d'inventer).
+- D'intégrer si possible :
+    - 📍 Terroir (type de sol, climat, influences géographiques)
+    - ⚙️ Détails de vinification (méthodes, techniques spécifiques)
+- De produire une fiche structurée claire, agréable et ultra détaillée :
+    1. 📋 Présentation générale (type exact de produit, nom complet, producteur)
+    2. 🏷️ Détails visibles sur l'étiquette (millésime, mentions spéciales, degré d'alcool si lisible)
+    3. 🌍 Origine (région, appellation, terroir, climat, influence du sol)
+    4. 🍇 Cépages utilisés
+    5. 🥂 Profil gustatif (nez, bouche, texture, équilibre, longueur)
+    6. 🍽️ Accords mets ultra précis (avec 3-4 exemples adaptés au profil gustatif)
+    7. 🔥 Conseils de dégustation (température, carafage, conditions idéales)
+    8. 💰 Prix indicatif ou fourchette (si trouvable)
+    9. 🕰️ Potentiel de garde
+    10. 🔍 Anecdotes ou informations notables (sur le domaine, la vinification, les récompenses)
+
+**Important :**
+- Si des informations importantes sont manquantes (ex: degré d'alcool, couleur, cépages…), **pose directement la question** à l'utilisateur de manière amicale.
+- Ne jamais inventer des détails non visibles ou non vérifiés.
+- Reste naturel et engageant dans le ton, pas robotique.
+
+Fais comme si tu rédigeais pour un sommelier passionné ou un amateur averti. 🍷
 """}
-    ]
+]
+
 
     if uploaded_image:
         image_bytes = uploaded_image.read()
