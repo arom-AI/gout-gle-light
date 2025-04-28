@@ -170,9 +170,6 @@ Sois engageant, accessible, et agréable à lire.
 """}
 ]
 
-]
-
-
     if uploaded_image:
         image_bytes = uploaded_image.read()
         image_base64 = base64.b64encode(image_bytes).decode('utf-8')
