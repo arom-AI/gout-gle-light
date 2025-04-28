@@ -159,11 +159,15 @@ if ask_button and question:
     # 🖼️ Analyse image seulement ici
     if uploaded_image:
         image_bytes = uploaded_image.read()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
         vision_request = [
-            {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
-            {"type": "image", "image": {"data": image_bytes, "mime_type": "image/jpeg"}}
-        ]
+            {"role": "user", "content": [
+                {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
+                {"type": "image", "image": {"base64": image_base64}}
+            ]}
+    ]
+
 
         try:
             vision_response = client.chat.completions.create(
