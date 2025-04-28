@@ -161,24 +161,26 @@ if ask_button and question:
         image_bytes = uploaded_image.read()
         image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
-        vision_request = [
-            {"role": "user", "content": [
-                {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
-                {"type": "image", "image": {"base64": image_base64}}
-            ]}
-    ]
-
-
         try:
             vision_response = client.chat.completions.create(
                 model="gpt-4o",
-                messages=[{"role": "user", "content": vision_request}],
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": "Décris précisément ce que tu vois sur cette image."},
+                            {"type": "image", "image": {"base64": image_base64}}
+                        ]
+                    }
+                ],
                 temperature=0
             )
+
             infos_detectees = vision_response.choices[0].message.content.strip().lower()
 
         except Exception as e:
             st.warning(f"❗ Impossible d'analyser l'image : {e}")
+
 
         # 🧠 Maintenant générer les questions complémentaires
         questions = []
