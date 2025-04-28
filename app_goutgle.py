@@ -139,7 +139,7 @@ if ask_button and question:
     local_context = find_relevant_context(question)
     web_context = search_web(question) if use_web else ""
 
-prompt = f"""
+    prompt = f"""
 Voici la question de l'utilisateur : {question}
 
 Utilise toutes les informations suivantes pour répondre :
