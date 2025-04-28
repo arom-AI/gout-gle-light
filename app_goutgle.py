@@ -177,7 +177,7 @@ Puis, en fonction du produit reconnu, fournis une réponse complète et adaptée
   - Ne fais pas d'hypothèses hasardeuses.
 
 Reste clair, structuré et agréable à lire. Utilise si possible des bullet points pour rendre la lecture facile.
-"""}
+"""},
 
               {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}}
 
