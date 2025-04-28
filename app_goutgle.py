@@ -135,7 +135,49 @@ Si une image est jointe, analyse-la pour extraire toute information pertinente.
         messages.append({
           "role": "user",
           "content": [
-              {"type": "text", "text": "Voici une image liée à la question, analyse-la :"},
+              {"type": "text", "text": "Voici une image d'un produit lié au monde de la boisson ou de l'alimentation. Analyse-la attentivement.
+
+Décris précisément ce que tu identifies (bouteille, étiquette, marque, type de boisson, informations visibles). 
+Base-toi uniquement sur ce que tu vois pour répondre.
+
+Puis, en fonction du produit reconnu, fournis une réponse complète et adaptée :
+- S'il s'agit d'un vin : 
+  - Domaine, cuvée, millésime, mention spéciale
+  - Histoire éventuelle du domaine
+  - Qualité du millésime
+  - Fourchette de prix indicative
+  - Accord mets-vins recommandé
+  - Profil gustatif attendu
+  - Température de service
+  - Potentiel de garde
+
+- S'il s'agit d'un spiritueux (whisky, rhum, gin, etc.) :
+  - Nom du producteur, gamme, type (single malt, blend, rhum agricole…)
+  - Informations sur l’origine
+  - Arômes dominants et profil gustatif attendu
+  - Degré d’alcool
+  - Fourchette de prix
+  - Conseils de dégustation (pur, avec glaçons, en cocktail…)
+
+- S'il s'agit d'une bière :
+  - Brasserie, nom de la bière
+  - Type de bière (IPA, stout, lager, etc.)
+  - Profil gustatif et caractéristiques principales
+  - Degré d'alcool
+  - Accord mets-bière
+
+- S'il s'agit d'un soft drink (soda, jus, eau…) :
+  - Marque, type exact de boisson
+  - Informations nutritionnelles éventuelles
+  - Positionnement du produit (premium, classique, artisanal…)
+
+- Pour tout autre produit :
+  - Décris de manière factuelle et complète ce que tu vois
+  - Donne des informations utiles si disponibles
+  - Ne fais pas d'hypothèses hasardeuses.
+
+Reste clair, structuré et agréable à lire. Utilise si possible des bullet points pour rendre la lecture facile.
+"},
               {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}}
 
           ]
